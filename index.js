@@ -37,13 +37,14 @@ const colorCodes = {
  * Development logger.
  */
 
-function dev(opts = {}) {
-  const logger = opts.logger || console;
+function dev(logger = console) {
+  const _logger = logger || console;
+  _logger.log = _logger.info || _logger.log || console.log;
 
   return function logger(ctx, next) {
     // request
     const start = new Date;
-    logger.log('  ' + chalk.gray('<--')
+    _logger.log('  ' + chalk.gray('<--')
       + ' ' + chalk.bold('%s')
       + ' ' + chalk.gray('%s'),
         ctx.method,
@@ -86,58 +87,58 @@ function dev(opts = {}) {
     });
 
   }
-}
 
-/**
- * Log helper.
- */
+  /**
+   * Log helper.
+   */
 
-function log(ctx, start, len, err, event) {
-  // get the status code of the response
-  const status = err
-    ? (err.status || 500)
-    : (ctx.status || 404);
+  function log(ctx, start, len, err, event) {
+    // get the status code of the response
+    const status = err
+      ? (err.status || 500)
+      : (ctx.status || 404);
 
-  // set the color of the status code;
-  const s = status / 100 | 0;
-  const color = colorCodes[s];
+    // set the color of the status code;
+    const s = status / 100 | 0;
+    const color = colorCodes[s];
 
-  // get the human readable response length
-  let length;
-  if (~[204, 205, 304].indexOf(status)) {
-    length = '';
-  } else if (null == len) {
-    length = '-';
-  } else {
-    length = bytes(len);
+    // get the human readable response length
+    let length;
+    if (~[204, 205, 304].indexOf(status)) {
+      length = '';
+    } else if (null == len) {
+      length = '-';
+    } else {
+      length = bytes(len);
+    }
+
+    const upstream = err ? chalk.red('xxx')
+      : event === 'close' ? chalk.yellow('-x-')
+      : chalk.gray('-->')
+
+    _logger.log('  ' + upstream
+      + ' ' + chalk.bold('%s')
+      + ' ' + chalk.gray('%s')
+      + ' ' + chalk[color]('%s')
+      + ' ' + chalk.gray('%s')
+      + ' ' + chalk.gray('%s'),
+        ctx.method,
+        ctx.originalUrl,
+        status,
+        time(start),
+        length);
   }
 
-  const upstream = err ? chalk.red('xxx')
-    : event === 'close' ? chalk.yellow('-x-')
-    : chalk.gray('-->')
+  /**
+   * Show the response time in a human readable format.
+   * In milliseconds if less than 10 seconds,
+   * in seconds otherwise.
+   */
 
-  logger.log('  ' + upstream
-    + ' ' + chalk.bold('%s')
-    + ' ' + chalk.gray('%s')
-    + ' ' + chalk[color]('%s')
-    + ' ' + chalk.gray('%s')
-    + ' ' + chalk.gray('%s'),
-      ctx.method,
-      ctx.originalUrl,
-      status,
-      time(start),
-      length);
-}
-
-/**
- * Show the response time in a human readable format.
- * In milliseconds if less than 10 seconds,
- * in seconds otherwise.
- */
-
-function time(start) {
-  const delta = new Date - start;
-  return humanize(delta < 10000
-    ? delta + 'ms'
-    : Math.round(delta / 1000) + 's');
+  function time(start) {
+    const delta = new Date - start;
+    return humanize(delta < 10000
+      ? delta + 'ms'
+      : Math.round(delta / 1000) + 's');
+  }
 }
