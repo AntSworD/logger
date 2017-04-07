@@ -1,4 +1,17 @@
 
+## Different with `koa-logger` - Diy your logger
+
+  The Logger which diy by yourself have to defined a method that name `log` or `info`.
+
+```js
+const logger = require('koa-diy-logger')
+const Koa = require('koa')
+const diyLogger = require('log4js').getLogger();
+
+const app = new Koa()
+app.use(logger(diyLogger))
+```
+
 # koa-logger
 
 [![npm version][npm-image]][npm-url]
@@ -22,7 +35,7 @@ ___Notice: `koa-logger@2` supports `koa@2`; if you want to use this module with 
 ## Installation
 
 ```js
-$ npm install koa-logger
+$ npm install koa-diy-logger
 ```
 
 ## Example

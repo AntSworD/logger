@@ -1,8 +1,8 @@
 {
-  "name": "koa-logger",
+  "name": "koa-diy-logger",
   "description": "Logging middleware for koa",
-  "repository": "koajs/logger",
-  "version": "2.0.1",
+  "repository": "https://github.com/AntSworD/logger",
+  "version": "2.0.2",
   "keywords": [
     "koa",
     "middleware",
