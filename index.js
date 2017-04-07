@@ -37,11 +37,13 @@ const colorCodes = {
  * Development logger.
  */
 
-function dev(opts) {
+function dev(opts = {}) {
+  const logger = opts.logger || console;
+
   return function logger(ctx, next) {
     // request
     const start = new Date;
-    console.log('  ' + chalk.gray('<--')
+    logger.log('  ' + chalk.gray('<--')
       + ' ' + chalk.bold('%s')
       + ' ' + chalk.gray('%s'),
         ctx.method,
@@ -114,7 +116,7 @@ function log(ctx, start, len, err, event) {
     : event === 'close' ? chalk.yellow('-x-')
     : chalk.gray('-->')
 
-  console.log('  ' + upstream
+  logger.log('  ' + upstream
     + ' ' + chalk.bold('%s')
     + ' ' + chalk.gray('%s')
     + ' ' + chalk[color]('%s')
